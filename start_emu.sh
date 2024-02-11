@@ -8,12 +8,11 @@ NC='\033[0m' # No Color
 
 function wait_emulator_to_be_ready() {
   emulator_name=${EMULATOR_NAME}
-  emulator -avd "${emulator_name}" -no-boot-anim -gpu off
 
-  # Metal instances:
-  #emulator -avd "${emulator_name}" -no-audio -ports 5554,5555 -skip-adb-auth -no-boot-anim -show-kernel
+  # ARM instances:
+  emulator -avd "${emulator_name}" -no-audio -ports 5554,5555 -skip-adb-auth -no-boot-anim -show-kernel
 
-  # Non-metal instances:
+  # x86 instances:
   #emulator -avd "${emulator_name}" -no-audio -ports 5554,5555 -skip-adb-auth -no-boot-anim -show-kernel -qemu -cpu max -machine gic-version=max
 
   printf "${G}==>  ${BL}Emulator has ${YE}${EMULATOR_NAME} ${BL}started in headed mode! ${G}<==${NC}""\n"

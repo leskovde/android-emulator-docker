@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 openjdk:18-jdk-slim
+FROM openjdk:18-jdk-slim
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -13,7 +13,6 @@ RUN apt update && apt install -y curl sudo wget unzip bzip2 libdrm-dev libxkbcom
 #==============================
 # Android SDK ARGS
 #==============================
-# TODO: Arch needs to be adjusted to x86_64 when built on x86_64
 #ARG ARCH="arm64-v8a"
 ARG ARCH="x86_64"
 ARG TARGET="google_apis_playstore"  
@@ -21,16 +20,11 @@ ARG API_LEVEL="34"
 ARG BUILD_TOOLS="34.0.0"
 ARG ANDROID_ARCH=${ANDROID_ARCH_DEFAULT}
 ARG ANDROID_API_LEVEL="android-${API_LEVEL}"
-#system-images;android-34;google_apis_playstore;arm64-v8a
 ARG DEVICE_IMAGE_NAME="system-images;${ANDROID_API_LEVEL};${TARGET};${ARCH}"
 ARG PLATFORM_VERSION="platforms;${ANDROID_API_LEVEL}"
 ARG BUILD_TOOL="build-tools;${BUILD_TOOLS}"
 ARG ANDROID_CMD="commandlinetools-linux-11076708_latest.zip"
-#ARG ANDROID_SDK_PACKAGES="${EMULATOR_PACKAGE} ${PLATFORM_VERSION} ${BUILD_TOOL} platform-tools"
 ARG ANDROID_SDK_PACKAGES="${PLATFORM_VERSION} ${BUILD_TOOL} platform-tools"
-#ARG EMULATOR_ZIP_FILE="sdk-repo-linux_aarch64-emulator-11411100.zip"
-ARG EMULATOR_ZIP_FILE="sdk-repo-linux-emulator-11434393.zip"
-ARG EMULATOR_PACKAGE_FILE="package.xml"
 
 #==============================
 # Set JAVA_HOME - SDK
@@ -38,9 +32,6 @@ ARG EMULATOR_PACKAGE_FILE="package.xml"
 ENV ANDROID_SDK_ROOT=/opt/android
 ENV PATH "$PATH:$ANDROID_SDK_ROOT/cmdline-tools/tools:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin:$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/${BUILD_TOOLS}"
 ENV DOCKER="true"
-
-#RUN apt-get update -y && \
-#    apt-get install qemu -y
 
 #============================================
 # Install required Android CMD-line tools
@@ -50,17 +41,17 @@ RUN wget https://dl.google.com/android/repository/${ANDROID_CMD} -P /tmp && \
               mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/tools && cd $ANDROID_SDK_ROOT/cmdline-tools &&  mv NOTICE.txt source.properties bin lib tools/  && \
               cd $ANDROID_SDK_ROOT/cmdline-tools/tools && ls
 
-COPY ${EMULATOR_ZIP_FILE} ./
-RUN unzip ${EMULATOR_ZIP_FILE} -d $ANDROID_SDK_ROOT
-COPY ${EMULATOR_PACKAGE_FILE} $ANDROID_SDK_ROOT/emulator/package.xml
-
 #============================================
 # Install required package using SDK manager
 #============================================
 RUN yes Y | sdkmanager --licenses
-#RUN yes Y | sdkmanager --verbose --no_https "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 RUN yes Y | sdkmanager --verbose --no_https ${ANDROID_SDK_PACKAGES}
-#RUN yes Y | sdkmanager --verbose --no_https "system-images;android-34;google_apis_playstore;arm64-v8a"
+
+# If the emulator package is not available, we have to copy a local version of it...
+COPY "emulator-${ARCH}.zip" ./
+COPY "package.xml" $ANDROID_SDK_ROOT/emulator/package.xml
+RUN yes Y | sdkmanager --verbose --no_https "emulator" || unzip "emulator-${ARCH}.zip" -d $ANDROID_SDK_ROOT
+
 RUN yes Y | sdkmanager --verbose --no_https ${DEVICE_IMAGE_NAME}
 
 #============================================
