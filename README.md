@@ -17,7 +17,7 @@ Down below is the list of the main scripts to launch the relevant service, certa
 
 1.  **build the docker image :** 
 
-        docker build android-emulator .
+        docker build -t android-emulator .
 
     OR for customized image
 
@@ -32,7 +32,7 @@ Down below is the list of the main scripts to launch the relevant service, certa
     
 2.  **Start your container:**
 
-        docker run -it --privileged -d -p 5900:5900 --name androidContainer --privileged android-emulator  
+        docker run -it --privileged -d -p 5900:5900 --name androidContainer android-emulator  
 
 3.  **Launch the appium session :**
 
@@ -90,13 +90,13 @@ The Docker Compose file simplifies the process of starting the service. It inclu
 
 **When manually starting the container, ensure to set the necessary environment variables for proper operation** 
 
-| Environments      | Description                                                                                              | Required          |  Service   |
-| ----------------- | -------------------------------------------------------------------------------------------------------- | ----------------- | -----------|
-| APPIUM_PORT       | Port for the appium instance                                                                             | optional          | Android    |
-| VNC_PASSWORD      | Password needed to connect to VNC Server                                                                 | optional          | VNC        |
-| OSTYPE            | linux or macos/darwin                                                                                    | optional          | Android    |
-| EMULATOR_TIMEOUT  | emulator booting up timeoue, default 240 second                                                          | optional          | Android    |
-| HW_ACCEL_OVERRIDE | Pass aceel options e.g "-accel on" or "-aceel off"                                                       | optional          | Android    
+| Environments      | Description                                        | Required          |  Service   |
+| ----------------- |----------------------------------------------------| ----------------- | -----------|
+| APPIUM_PORT       | Port for the appium instance                       | optional          | Android    |
+| VNC_PASSWORD      | Password needed to connect to VNC Server           | optional          | VNC        |
+| OSTYPE            | linux or macos/darwin                              | optional          | Android    |
+| EMULATOR_TIMEOUT  | emulator booting up timeout, default 240 second    | optional          | Android    |
+| HW_ACCEL_OVERRIDE | Pass aceel options e.g "-accel on" or "-aceel off" | optional          | Android    
 
 ## Kill the container
 
