@@ -48,9 +48,10 @@ RUN yes Y | sdkmanager --licenses
 RUN yes Y | sdkmanager --verbose --no_https ${ANDROID_SDK_PACKAGES}
 
 # If the emulator package is not available, we have to copy a local version of it...
-COPY "emulator-${ARCH}.zip" ./
-COPY "package.xml" $ANDROID_SDK_ROOT/emulator/package.xml
-RUN yes Y | sdkmanager --verbose --no_https "emulator" || unzip "emulator-${ARCH}.zip" -d $ANDROID_SDK_ROOT
+#COPY "emulator_${ARCH}.zip" ./
+#COPY "package.xml" $ANDROID_SDK_ROOT/emulator/package.xml
+RUN yes Y | sdkmanager --verbose --no_https "emulator"
+    #|| unzip "emulator_${ARCH}.zip" -d $ANDROID_SDK_ROOT
 
 RUN yes Y | sdkmanager --verbose --no_https ${DEVICE_IMAGE_NAME}
 
@@ -61,7 +62,7 @@ ARG EMULATOR_NAME="nexus"
 ARG EMULATOR_DEVICE="Nexus 6"
 ENV EMULATOR_NAME=$EMULATOR_NAME
 ENV DEVICE_NAME=$EMULATOR_DEVICE
-RUN echo "no" | avdmanager --verbose create avd --force --name "${EMULATOR_NAME}" --device "${EMULATOR_DEVICE}" --package "${DEVICE_IMAGE_NAME}"
+RUN avdmanager --verbose create avd --force --name "${EMULATOR_NAME}" --device "${EMULATOR_DEVICE}" --package "${DEVICE_IMAGE_NAME}"
 
 #====================================
 # Install latest nodejs, npm & appium
